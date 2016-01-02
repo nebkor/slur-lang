@@ -21,20 +21,37 @@
 (define (classify tok)
   tok)
 
-(define (parenthesize toks out)
-  (cond
-   [(null? toks) (reverse out)]
-   [(eqv? #f out) (list (parenthesize toks '()))]
-   [else
-    (let* ([tok (car toks)]
-           [rest (cdr toks)])
-      (match tok
-        ["(" (append out (parenthesize rest #f))]
-        [")" (reverse out)]
-        [a (parenthesize rest (cons (classify a) out))]))]))
+(define (ensure-list l)
+  (if (list? l)
+      l
+      (list l)))
 
-(define toks (tokenize "(foo (bar (baz 2)))"))
+(define (atom? e)
+  (not (list? e)))
 
-(define test (parenthesize toks #f))
+(define (p-append head tail)
+  (let ([lhead (ensure-list head)])
+    (cond
+     [(null? head) tail]
+     [(null? tail) lhead]
+     [else (append lhead (list tail))])))
 
-(displayln test)
+(define (parenthesize toks)
+  (define (p-help toks out)
+    (displayln out)
+    (cond
+     ;[(atom? toks) (p-append out toks)]
+     [(null? toks) out]
+     [else
+      (let* ([tok (car toks)]
+             [rest (cdr toks)])
+        (match tok
+          ["(" (append (ensure-list out) (p-help rest '()))]
+          [")" (append (list out) (p-help rest '()))]
+          [_ (p-help rest (p-append out (classify tok)))]))]))
+  (p-help toks '()))
+
+(begin
+  (define toks (tokenize "(a b c d (1 2 3 4) a1 (b1 c1) d1)"))
+  (define test (parenthesize toks))
+  (displayln test))
