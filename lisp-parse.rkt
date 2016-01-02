@@ -49,9 +49,9 @@
     (cond
      [(null? toks) out]
      [else
-      (let* ([tok (car toks)]
-             [rest (cdr toks)]
-             [lout (ensure-list out)])
+      (let ([tok (car toks)]
+            [rest (cdr toks)]
+            [lout (ensure-list out)])
         (match tok
           ["(" (append lout (p-help rest '() (add1 level)))]
           [")" (append (wrap-subterm lout level)
