@@ -3,7 +3,7 @@
 (provide parse-lisp)
 
 (define (parse-lisp str)
-  str)
+  (parenthesize (tokenize str)))
 
 (define (tokenize str)
   (string-split
@@ -29,17 +29,11 @@
      [(or num (pstring? tok)) (cons 'literal tok)]
      [else (cons 'identifier tok)])))
 
+;; everything below here is for parenthisizing
 (define (ensure-list l)
   (if (list? l)
       l
       (list l)))
-
-(define (p-append head tail)
-  (let ([lhead (ensure-list head)])
-    (cond
-     [(null? head) tail]
-     [(null? tail) lhead]
-     [else (append lhead (list tail))])))
 
 (define (wrap-subterm sterm level)
   (cond
@@ -47,7 +41,7 @@
    [(null? sterm) sterm]
    [else
     (for/fold ([out sterm])
-        ([l level])
+              ([l level])
       (list out))]))
 
 (define (parenthesize toks)
@@ -56,16 +50,11 @@
      [(null? toks) out]
      [else
       (let* ([tok (car toks)]
-             [rest (cdr toks)])
+             [rest (cdr toks)]
+             [lout (ensure-list out)])
         (match tok
-          ["(" (append (ensure-list out) (p-help rest '() (add1 level)))]
-          [")" (if (not (null? out))
-                   (append (wrap-subterm (ensure-list out) level)
-                           (p-help rest '() (sub1 level)))
-                   (append out (p-help rest '() (sub1 level))))]
-          [_ (p-help rest (p-append out (classify tok)) level)]))]))
+          ["(" (append lout (p-help rest '() (add1 level)))]
+          [")" (append (wrap-subterm lout level)
+                       (p-help rest '() (sub1 level)))]
+          [_ (p-help rest (append lout (list (classify tok))) level)]))]))
   (p-help toks '() -1))
-
-(begin
-  (define toks (tokenize "(a b c d (((1 2 3 4))) a1 a2 (b1 c1) d1 ((e1)) e2 e3 (e4 e5)))"))
-  (define test (parenthesize toks)))
