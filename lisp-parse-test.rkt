@@ -20,7 +20,7 @@
                         (identifier . "e3")
                         ((identifier . "e4") (identifier . "e5"))))
 
-(module+ test
+(module+ main
   (require rackunit rackunit/text-ui)
 
   (define suite
