@@ -26,7 +26,7 @@
   (define suite
     (test-suite
      "parse tests"
-     (test-equal? "single character" (parse-lisp "a") '((identifier . "a")))
+     (test-equal? "single character" (parse-lisp "a") '(identifier . "a"))
      (test-equal? "simple list" (parse-lisp "(a b)") '((identifier . "a") (identifier . "b")))
      (test-equal? "gnarly-sexp" (parse-lisp gnarly-sexp-string) gnarly-result)
      (test-equal? "literal quote" (parse-lisp "'(1 2 3)") '((identifier . "quote") (literal . "1") (literal . "2") (literal . "3")))))

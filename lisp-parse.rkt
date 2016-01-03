@@ -3,7 +3,11 @@
 (provide parse-lisp)
 
 (define (parse-lisp str)
-  (parenthesize (tokenize str)))
+  (let* ([p (parenthesize (tokenize str))]
+         [len (length p)])
+    (if (= 1 len)
+        (car p)
+        p)))
 
 (define (tokenize str)
   (string-split
